@@ -19,10 +19,16 @@ var Ingredient = Backbone.Model.extend({
   defaults: {
     name: '',
     units: '',
-    qty; 1
+    qty: 1
   }
 });
 
 var IngredientCollection = Backbone.Collection.extend({
   model: Ingredient
 });
+
+module.exports = {
+  Recipe,
+  Ingredient,
+  IngredientCollection
+};
