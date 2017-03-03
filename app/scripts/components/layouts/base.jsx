@@ -1,6 +1,9 @@
 var React = require('react');
 
 class BaseLayout extends React.Component{
+  constructor(props){
+    super(props);
+  }
   render(){
     return (
       <div>
@@ -73,7 +76,7 @@ class BaseLayout extends React.Component{
                 <input type="text" placeholder="Cook temp" />
               </div>
 
-              {props.children}
+              {this.props.children}
 
             </div>
 

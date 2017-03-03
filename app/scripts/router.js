@@ -9,8 +9,10 @@ var AppRouter = Backbone.Router.extend({
     '': 'index'
   },
   index: function(){
-    React.createElement(ServingsContainer),
-    document.getElementById('app')
+    ReactDOM.render(
+      React.createElement(ServingsContainer),
+      document.getElementById('app')
+    )
   }
 
 });
