@@ -13,7 +13,8 @@ var User = require('./models/user').User;
 var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'login',
-    'recipe/':'currentRecipe'
+    'recipe/':'currentRecipe',
+    'newrecipe/': 'addNewRecipe'
   },
   initialize: function(){
   // Do the parse setup to set headers and configure API url
@@ -36,7 +37,7 @@ var AppRouter = Backbone.Router.extend({
 
   return Backbone.Router.prototype.execute.apply(this, arguments);
   },
-  index: function(){
+  addNewRecipe: function(){
     ReactDOM.render(
       React.createElement(MainContainer),
       document.getElementById('app')

@@ -25,8 +25,8 @@ class BaseLayout extends React.Component{
 
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul className="nav navbar-nav navbar-right">
-                <li><a href="#">Add New Recipe</a></li>
-                <li><a href="#">My Recipes</a></li>
+                <li><a href="#newrecipe/">Add New Recipe</a></li>
+                <li><a href="#recipe/">My Recipes</a></li>
                 <li><a href="#"><button onClick={this.signOut} className="btn btn-danger" >Log Out</button></a></li>
               </ul>
             </div>

@@ -1,6 +1,9 @@
 var Backbone = require('backbone');
 
+var parse = require('../setup');
+
 var Recipe = Backbone.Model.extend({
+  idAttribute: 'objectId',
   defaults: function() {
     return {
       name: '',
@@ -13,6 +16,16 @@ var Recipe = Backbone.Model.extend({
   //   var newAmount = this.qty/ newServingSize;
   //   return ingredients.qty * newAmount;
   // }
+});
+
+var RecipeCollection = Backbone.Collection.extend({
+  model: Recipe,
+  url: function(){
+    return parse.BASE_API_URL + '/classes/gregory'
+  },
+  parse: function(data){
+    return data.results
+  }
 });
 
 var Ingredient = Backbone.Model.extend({
@@ -29,6 +42,7 @@ var IngredientCollection = Backbone.Collection.extend({
 
 module.exports = {
   Recipe,
+  RecipeCollection,
   Ingredient,
   IngredientCollection
 };
