@@ -14,20 +14,33 @@ class ServingsContainer extends React.Component{
       {name: 'beef tenderloin', qty: 3, units: 'lbs'}
     ]);
 
+    this.changeServing = this.changeServing.bind(this);
+
     this.state = {
-      ingredientCollection: ingredientCollection
+      ingredientCollection: ingredientCollection,
+      modifier: 1
     }
+
+  }
+  changeServing(modifier){
+    var multiplier = this.state.modifier;
+    multiplier = modifier;
+    this.setState({modifier: multiplier});
+
   }
   render(){
     return (
       <BaseLayout>
         <div className="serving-size">
           <div className="row">
-            <ServingsForm />
+            <ServingsForm changeServing={this.changeServing} />
           </div>
             <h3>Ingredients you'll need:</h3>
 
-            <IngredientList ingredientCollection={this.state.ingredientCollection}/>
+            <IngredientList
+              ingredientCollection={this.state.ingredientCollection}
+              modifier={this.state.modifier}
+            />
         </div>
       </BaseLayout>
     )
@@ -37,15 +50,26 @@ class ServingsContainer extends React.Component{
 class ServingsForm extends React.Component{
   constructor(props){
     super(props);
-    
-  }
-  changeServing(){
+    this.handleChangeServing = this.handleChangeServing.bind(this);
+    this.changeServing = this.changeServing.bind(this);
 
+    this.state = {
+      modifier: 1
+    }
+  }
+  handleChangeServing(e){
+    e.preventDefault();
+    this.setState({modifier: e.target.value});
+    // var modifier = (recipe.qty / this.state.modifier);
+  }
+  changeServing(e){
+    e.preventDefault();
+    this.props.changeServing(this.state.modifier)
   }
   render(){
     return (
-      <form className="well"action="">
-        <span>Makes <input onChange={this.changeServing} className="form-control serving-number" type="text" /> servings</span>
+      <form onSubmit={this.changeServing} className="well"action="">
+        <span>Makes <input onChange={this.handleChangeServing} className="form-control serving-number" value={this.state.modifier} type="text" /> servings</span>
         <div className="input-group">
           <span className="input-group-addon">
             <input type="radio" aria-label="..." />
@@ -61,11 +85,21 @@ class ServingsForm extends React.Component{
 }
 
 class IngredientList extends React.Component{
+  constructor(props){
+    super(props);
+
+
+
+  }
+  // componentWillReceiveProps(multiplier){
+  //   console.log(this.state.modifier);
+  //   this.setState({modifier: this.props.modifier});
+  // }
   render(){
 
     var ingredients = this.props.ingredientCollection.map(foodItem =>{
       return (
-        <li key={foodItem.cid} className="list-group-item"><input type="checkbox" value="" /><span>{foodItem.get('qty')} {foodItem.get('units')} {foodItem.get('name')}</span></li>
+        <li key={foodItem.cid} className="list-group-item"><input type="checkbox" value={this.props.modifier} /><span> {foodItem.get('qty') * this.props.modifier} {foodItem.get('units')} {foodItem.get('name')}</span></li>
       )
     })
     return (
