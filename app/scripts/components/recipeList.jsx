@@ -1,9 +1,12 @@
 var React = require('react');
+var Backbone = require('backbone');
 
 var BaseLayout = require('./layouts/base.jsx').BaseLayout;
 var IngredientCollection = require('../models/models.js').IngredientCollection;
 var Ingredient = require('../models/models.js').Ingredient;
 var RecipeCollection = require('../models/models.js').RecipeCollection;
+
+var myRouter = require('../router.js').myRouter;
 
 class MainContainer extends React.Component {
   constructor(props){
@@ -18,6 +21,7 @@ class MainContainer extends React.Component {
 
     this.addNewRecipe = this.addNewRecipe.bind(this);
     this.handleToggleForm = this.handleToggleForm.bind(this);
+    this.viewRecipe = this.viewRecipe.bind(this);
 
     this.state = {
       recipeCollection,
@@ -35,11 +39,17 @@ class MainContainer extends React.Component {
     this.setState({showForm: !this.state.showForm});
 
   }
+  viewRecipe(recipe){
+    Backbone.history.navigate('recipes/' + recipe.get('objectId'), {trigger: true});
+
+  }
   render(){
     return(
       <BaseLayout>
         <div className="row">
-          <RecipesList recipeCollection={this.state.recipeCollection} />
+          <RecipesList recipeCollection={this.state.recipeCollection}
+                        viewRecipe={this.viewRecipe}
+                        />
         </div>
         <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default">+</button></h4>
 
@@ -61,9 +71,10 @@ class RecipesList extends React.Component {
 
           <div key={recipe.cid} className="col-sm-6 col-md-4">
             <div className="thumbnail">
-              <img src="" alt="" />
+              <img src={recipe.get('url')} alt="" />
               <div className="caption">
-                <h3><a
+                <h3><a onClick={(e) => {e.preventDefault();
+                     this.props.viewRecipe(recipe);}}
                   href={"recipes/#" + recipe.get('objectId')}>
                   {recipe.get('name')}</a></h3>
               </div>
@@ -96,11 +107,13 @@ class RecipeForm extends React.Component{
     this.handleIngredName = this.handleIngredName.bind(this);
 
     this.addNewRecipe = this.addNewRecipe.bind(this);
+    this.handleUrl = this.handleUrl.bind(this);
 
 
     this.state = {
       name: '',
       qty: 1,
+      url: '',
       ingredients: ingredients,
       tempIngred: new Ingredient(),
     }
@@ -118,6 +131,9 @@ class RecipeForm extends React.Component{
   handleServingSize(e){
     this.setState({qty: e.target.value});
     console.log(this.state);
+  }
+  handleUrl(e){
+    this.setState({url: e.target.value});
   }
   handleIngredAmount(e){
     this.state.tempIngred.set('qty', e.target.value);
@@ -146,7 +162,7 @@ class RecipeForm extends React.Component{
               <a href="#" className="thumbnail">
                 <img src="" alt="" />
               </a>
-              <input placeholder="Image url"/>
+              <input onChange={this.handleUrl} placeholder="Image url"/>
             </div>
             <input onChange={this.handleRecipeName} type="text" placeholder="Recipe Name" />
             <input onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
@@ -171,13 +187,14 @@ class RecipeForm extends React.Component{
           </div>
           <div className="row">
             <h3>Add ingredients:</h3>
-              <input onChange={this.handleIngredAmount} type="number" className="form-control" placeholder="#" />
-              <input onChange={this.handleIngredUnits} type="text" className="form-control" placeholder="units" />
-              <div className="input-group">
-                <input onChange={this.handleIngredName} type="text" className="form-control" placeholder="onions, potatos, etc..." />
-                <span className="input-group-btn">
-                  <button onClick={this.addIngredient} className="btn btn-default" type="button">+</button>
-                </span>
+
+                <input onChange={this.handleIngredAmount} type="number" className="form-control ingred-amount" placeholder="#" />
+                <input onChange={this.handleIngredUnits} type="text" className="form-control ingred-units" placeholder="units" />
+                <div className="input-group">
+                  <input onChange={this.handleIngredName} type="text" className="form-control ingred-name" placeholder="onions, potatos, etc..." />
+                  <span className="input-group-btn">
+                    <button onClick={this.addIngredient} className="btn btn-default" type="button">+</button>
+                  </span>
               </div>
                 <IngredientsForm ingredients={this.state.ingredients}/>
           </div>
