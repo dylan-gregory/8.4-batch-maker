@@ -51,7 +51,7 @@ class MainContainer extends React.Component {
                         viewRecipe={this.viewRecipe}
                         />
         </div>
-        <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default">+</button></h4>
+        <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default"><i className="fa fa-plus" aria-hidden="true"></i></button></h4>
 
         {this.state.showForm ? <RecipeForm
                                 addNewRecipe={this.addNewRecipe}
@@ -162,10 +162,12 @@ class RecipeForm extends React.Component{
               <a href="#" className="thumbnail">
                 <img src="" alt="" />
               </a>
-              <input onChange={this.handleUrl} placeholder="Image url"/>
+              <input className="form-control" onChange={this.handleUrl} placeholder="Image url"/>
             </div>
-            <input onChange={this.handleRecipeName} type="text" placeholder="Recipe Name" />
-            <input onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
+            <div className="col-xs-6 col-md-8">
+              <input className="form-control" onChange={this.handleRecipeName} type="text" placeholder="Recipe Name" />
+              <input className="form-control" onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
+            </div>
             <div className="checkbox">
               <label>
                 <input type="checkbox" value="" />
@@ -185,15 +187,15 @@ class RecipeForm extends React.Component{
             <input type="text" placeholder="Cook time" />
             <input type="text" placeholder="Cook temp" />
           </div>
-          <div className="row">
-            <h3>Add ingredients:</h3>
 
+            <h3>Add ingredients:</h3>
+            <div className="row flexbox">
                 <input onChange={this.handleIngredAmount} type="number" className="form-control ingred-amount" placeholder="#" />
                 <input onChange={this.handleIngredUnits} type="text" className="form-control ingred-units" placeholder="units" />
-                <div className="input-group">
-                  <input onChange={this.handleIngredName} type="text" className="form-control ingred-name" placeholder="onions, potatos, etc..." />
+                <div className="input-group ingred-name">
+                  <input onChange={this.handleIngredName} type="text" className="form-control" placeholder="onions, potatos, etc..." />
                   <span className="input-group-btn">
-                    <button onClick={this.addIngredient} className="btn btn-default" type="button">+</button>
+                    <button onClick={this.addIngredient} className="btn btn-default form-control" type="button"><i className="fa fa-plus" aria-hidden="true"></i></button>
                   </span>
               </div>
                 <IngredientsForm ingredients={this.state.ingredients}/>

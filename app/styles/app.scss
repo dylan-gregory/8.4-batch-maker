@@ -27,12 +27,19 @@ img {
 
 .ingred-amount{
   width: 10%;
+  margin-right: 15px;
 }
 
 .ingred-units{
-  width: 10%;
+  width: 15%;
+  margin-right: 15px;
 }
 
 .ingred-name{
-  max-width: 50%;
+  width: 50%;
+}
+
+.flexbox{
+  display: flex;
+
 }
