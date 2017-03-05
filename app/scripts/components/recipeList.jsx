@@ -3,17 +3,50 @@ var React = require('react');
 var BaseLayout = require('./layouts/base.jsx').BaseLayout;
 var IngredientCollection = require('../models/models.js').IngredientCollection;
 var Ingredient = require('../models/models.js').Ingredient;
+var RecipeCollection = require('../models/models.js').RecipeCollection;
 
 class MainContainer extends React.Component {
   constructor(props){
     super(props);
+
+    this.addNewRecipe = this.addNewRecipe.bind(this);
+
+    var recipeCollection = new RecipeCollection();
+    recipeCollection.fetch().then(()=> {
+      this.setState({recipeCollection});
+    });
+
+    this.addNewRecipe = this.addNewRecipe.bind(this);
+    this.handleToggleForm = this.handleToggleForm.bind(this);
+
+    this.state = {
+      recipeCollection,
+      showForm: false
+    }
+
+  }
+  addNewRecipe(recipe){
+    this.state.recipeCollection.create(recipe, {success: () => {
+      this.setState({recipeCollection: this.state.recipeCollection});
+    }});
+  }
+  handleToggleForm(e){
+    e.preventDefault();
+    this.setState({showForm: !this.state.showForm});
+
   }
   render(){
     return(
       <BaseLayout>
-        <RecipesList />
+        <div className="row">
+          <RecipesList recipeCollection={this.state.recipeCollection} />
+        </div>
+        <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default">+</button></h4>
 
-        <RecipeForm />
+        {this.state.showForm ? <RecipeForm
+                                addNewRecipe={this.addNewRecipe}
+                                /> : null}
+
       </BaseLayout>
 
     )
@@ -22,8 +55,26 @@ class MainContainer extends React.Component {
 
 class RecipesList extends React.Component {
   render(){
+
+    var recipeList = this.props.recipeCollection.map(recipe =>{
+      return (
+
+          <div key={recipe.cid} className="col-sm-6 col-md-4">
+            <div className="thumbnail">
+              <img src="" alt="" />
+              <div className="caption">
+                <h3><a
+                  href={"recipes/#" + recipe.get('objectId')}>
+                  {recipe.get('name')}</a></h3>
+              </div>
+            </div>
+          </div>
+
+      )
+    });
+
     return (
-      <span>Recipes</span>
+      <span>{recipeList}</span>
     )
   }
 }
@@ -44,13 +95,14 @@ class RecipeForm extends React.Component{
     this.handleIngredUnits = this.handleIngredUnits.bind(this);
     this.handleIngredName = this.handleIngredName.bind(this);
 
+    this.addNewRecipe = this.addNewRecipe.bind(this);
 
 
     this.state = {
       name: '',
-      qty: '',
+      qty: 1,
       ingredients: ingredients,
-      tempIngred: new Ingredient()
+      tempIngred: new Ingredient(),
     }
   }
   addIngredient(){
@@ -78,52 +130,60 @@ class RecipeForm extends React.Component{
   handleIngredName(e){
     this.state.tempIngred.set('name', e.target.value);
   }
+  addNewRecipe(e){
+    e.preventDefault();
+    this.props.addNewRecipe(this.state);
+
+  }
   render(){
 
     return (
-      <form>
-        <div className="row">
-          <h3>Add a new recipe</h3>
-          <div className="col-xs-6 col-md-4">
-            <a href="#" className="thumbnail">
-              <img src="" alt="" />
-            </a>
-            <input placeholder="Image url"/>
-          </div>
-          <input onChange={this.handleRecipeName} type="text" placeholder="Recipe Name" />
-          <input onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
-          <div className="checkbox">
-            <label>
-              <input type="checkbox" value="" />
-              Make Public
-            </label>
-          </div>
-          <div className="checkbox">
-            <label>
-              <input type="checkbox" value="" />
-              Keep Private
-            </label>
-          </div>
-        </div>
+      <div className="row">
+        <form onSubmit={this.addNewRecipe}>
+          <div className="row">
 
-        <div className="row">
-          <input type="text" placeholder="Prep time" />
-          <input type="text" placeholder="Cook time" />
-          <input type="text" placeholder="Cook temp" />
-        </div>
-        <div className="row">
-          <h3>Add ingredients:</h3>
-            <input onChange={this.handleIngredAmount} type="number" className="form-control" placeholder="#" />
-            <input onChange={this.handleIngredUnits} type="text" className="form-control" placeholder="units" />
-            <div className="input-group">
-              <input onChange={this.handleIngredName} type="text" className="form-control" placeholder="onions, potatos, etc..." />
-              <span className="input-group-btn">
-                <button onClick={this.addIngredient} className="btn btn-default" type="button">+</button>
-              </span>
+            <div className="col-xs-6 col-md-4">
+              <a href="#" className="thumbnail">
+                <img src="" alt="" />
+              </a>
+              <input placeholder="Image url"/>
             </div>
-              <IngredientsForm ingredients={this.state.ingredients}/>
-        </div>
-      </form>
+            <input onChange={this.handleRecipeName} type="text" placeholder="Recipe Name" />
+            <input onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
+            <div className="checkbox">
+              <label>
+                <input type="checkbox" value="" />
+                Make Public
+              </label>
+            </div>
+            <div className="checkbox">
+              <label>
+                <input type="checkbox" value="" />
+                Keep Private
+              </label>
+            </div>
+          </div>
+
+          <div className="row">
+            <input type="text" placeholder="Prep time" />
+            <input type="text" placeholder="Cook time" />
+            <input type="text" placeholder="Cook temp" />
+          </div>
+          <div className="row">
+            <h3>Add ingredients:</h3>
+              <input onChange={this.handleIngredAmount} type="number" className="form-control" placeholder="#" />
+              <input onChange={this.handleIngredUnits} type="text" className="form-control" placeholder="units" />
+              <div className="input-group">
+                <input onChange={this.handleIngredName} type="text" className="form-control" placeholder="onions, potatos, etc..." />
+                <span className="input-group-btn">
+                  <button onClick={this.addIngredient} className="btn btn-default" type="button">+</button>
+                </span>
+              </div>
+                <IngredientsForm ingredients={this.state.ingredients}/>
+          </div>
+          <input type="submit" className="btn btn-success" value="Add New Recipe"/>
+        </form>
+      </div>
     )
   }
 }

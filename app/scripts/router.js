@@ -13,8 +13,8 @@ var User = require('./models/user').User;
 var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'login',
-    'recipe/':'currentRecipe',
-    'newrecipe/': 'addNewRecipe'
+    'recipes/:id':'currentRecipe',
+    'recipes/': 'addNewRecipe'
   },
   initialize: function(){
   // Do the parse setup to set headers and configure API url
@@ -31,7 +31,7 @@ var AppRouter = Backbone.Router.extend({
   }
 
   if(user && name == 'login'){
-    this.navigate('recipe/', {trigger: true});
+    this.navigate('recipes/', {trigger: true});
     return false;
   }
 
@@ -43,9 +43,9 @@ var AppRouter = Backbone.Router.extend({
       document.getElementById('app')
     )
   },
-  currentRecipe: function(){
+  currentRecipe: function(id){
     ReactDOM.render(
-      React.createElement(ServingsContainer),
+      React.createElement(ServingsContainer, id),
       document.getElementById('app')
     )
   },

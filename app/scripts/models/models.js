@@ -11,11 +11,6 @@ var Recipe = Backbone.Model.extend({
       ingredients: new IngredientCollection()
     }
   }
-  // Rough sketch of what I need to do to update the ingredients
-  // servings: function(){
-  //   var newAmount = this.qty/ newServingSize;
-  //   return ingredients.qty * newAmount;
-  // }
 });
 
 var RecipeCollection = Backbone.Collection.extend({

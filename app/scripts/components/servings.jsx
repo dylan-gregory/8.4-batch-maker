@@ -2,11 +2,13 @@ var React = require('react');
 
 var BaseLayout = require('./layouts/base.jsx').BaseLayout;
 var IngredientCollection = require('../models/models.js').IngredientCollection;
+var RecipeCollection = require('../models/models.js').RecipeCollection;
 
 class ServingsContainer extends React.Component{
   constructor(props){
     super(props);
     var ingredientCollection = new IngredientCollection();
+
 
     ingredientCollection.add([
       {name: 'chopped onion', qty: 1, units: 'cup'},
