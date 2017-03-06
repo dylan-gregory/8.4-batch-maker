@@ -8,6 +8,8 @@ var RecipeCollection = require('../models/models.js').RecipeCollection;
 
 var myRouter = require('../router.js').myRouter;
 
+
+
 class MainContainer extends React.Component {
   constructor(props){
     super(props);
@@ -50,6 +52,10 @@ class MainContainer extends React.Component {
           <RecipesList recipeCollection={this.state.recipeCollection}
                         viewRecipe={this.viewRecipe}
                         />
+            <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default"><i className="fa fa-plus" aria-hidden="true"></i></button></h4>
+            {this.state.showForm ? <RecipeForm
+                                    addNewRecipe={this.addNewRecipe}
+                                    /> : null}
         </div>
       </BaseLayout>
 
@@ -57,11 +63,9 @@ class MainContainer extends React.Component {
   }
 }
 
+
 // this was used when I had the add form on the same page
-// <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default"><i className="fa fa-plus" aria-hidden="true"></i></button></h4>
-// {this.state.showForm ? <RecipeForm
-//                         addNewRecipe={this.addNewRecipe}
-//                         /> : null}
+
 
 
 class RecipesList extends React.Component {
@@ -98,6 +102,12 @@ class RecipeForm extends React.Component{
     super(props);
 
     var ingredients = new IngredientCollection();
+    this.addNewRecipe = this.addNewRecipe.bind(this);
+
+    var recipeCollection = new RecipeCollection();
+    recipeCollection.fetch().then(()=> {
+      this.setState({recipeCollection});
+    });
 
     this.addIngredient = this.addIngredient.bind(this);
     this.handleRecipeName = this.handleRecipeName.bind(this);
@@ -114,10 +124,11 @@ class RecipeForm extends React.Component{
 
     this.state = {
       name: '',
-      qty: 1,
+      qty: '',
       url: '',
       ingredients: ingredients,
       tempIngred: new Ingredient(),
+      recipeCollection
     }
   }
   addIngredient(){
@@ -148,11 +159,18 @@ class RecipeForm extends React.Component{
   handleIngredName(e){
     this.state.tempIngred.set('name', e.target.value);
   }
-  addNewRecipe(e){
+  addNewRecipe(e, recipe){
     e.preventDefault();
-    this.props.addNewRecipe(this.state);
-
+      this.state.recipeCollection.create(recipe, {success: () => {
+        this.setState({recipeCollection: this.state.recipeCollection});
+      }});
   }
+  // addNewRecipe(e){
+  //
+  //   console.log('here');
+  //   // this.props.addNewRecipe(this.state);
+  //
+  // }
   deleteFromOrder(item){
     var updatedOrder = this.state.ingredients;
     updatedOrder.remove(item);
@@ -175,10 +193,7 @@ class RecipeForm extends React.Component{
             </div>
             <div className="col-xs-6 col-md-8">
               <div className="row">
-              <label htmlFor="label-test">Click Me</label>
-              <input id="label-test" type="text" />
 
-              <label className="control-label" htmlFor="name">Recipe Name</label>
               <input className="form-control" onChange={this.handleRecipeName} id="name" type="text" placeholder="Recipe Name" />
               <input className="form-control" onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
               </div>

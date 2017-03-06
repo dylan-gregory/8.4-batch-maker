@@ -56,7 +56,6 @@ var AppRouter = Backbone.Router.extend({
   },
   currentRecipe: function(id){
 
-
     ReactDOM.render(
       React.createElement(ServingsContainer, {id: id}),
       document.getElementById('app')
