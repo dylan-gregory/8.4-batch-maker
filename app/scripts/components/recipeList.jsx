@@ -51,17 +51,16 @@ class MainContainer extends React.Component {
                         viewRecipe={this.viewRecipe}
                         />
         </div>
-        <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default"><i className="fa fa-plus" aria-hidden="true"></i></button></h4>
-
-        {this.state.showForm ? <RecipeForm
-                                addNewRecipe={this.addNewRecipe}
-                                /> : null}
-
       </BaseLayout>
 
     )
   }
 }
+// this was used when I had the add form on the same page
+// <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default"><i className="fa fa-plus" aria-hidden="true"></i></button></h4>
+// {this.state.showForm ? <RecipeForm
+//                         addNewRecipe={this.addNewRecipe}
+//                         /> : null}
 
 class RecipesList extends React.Component {
   render(){
@@ -75,7 +74,7 @@ class RecipesList extends React.Component {
               <div className="caption">
                 <h3><a onClick={(e) => {e.preventDefault();
                      this.props.viewRecipe(recipe);}}
-                  href={"recipes/#" + recipe.get('objectId')}>
+                  href={"recipes/" + recipe.get('objectId')}>
                   {recipe.get('name')}</a></h3>
               </div>
             </div>
@@ -108,6 +107,7 @@ class RecipeForm extends React.Component{
 
     this.addNewRecipe = this.addNewRecipe.bind(this);
     this.handleUrl = this.handleUrl.bind(this);
+    this.deleteFromOrder = this.deleteFromOrder.bind(this);
 
 
     this.state = {
@@ -151,9 +151,15 @@ class RecipeForm extends React.Component{
     this.props.addNewRecipe(this.state);
 
   }
+  deleteFromOrder(item){
+    var updatedOrder = this.state.ingredients;
+    updatedOrder.remove(item);
+    this.setState({ingredients: updatedOrder});
+  }
   render(){
 
     return (
+      <BaseLayout>
       <div className="row">
         <form onSubmit={this.addNewRecipe}>
           <div className="row">
@@ -198,11 +204,14 @@ class RecipeForm extends React.Component{
                     <button onClick={this.addIngredient} className="btn btn-default form-control" type="button"><i className="fa fa-plus" aria-hidden="true"></i></button>
                   </span>
               </div>
-                <IngredientsForm ingredients={this.state.ingredients}/>
+                <IngredientsForm ingredients={this.state.ingredients}
+                                 deleteFromOrder={this.deleteFromOrder}
+                  />
           </div>
           <input type="submit" className="btn btn-success" value="Add New Recipe"/>
         </form>
       </div>
+      </BaseLayout>
     )
   }
 }
@@ -221,10 +230,16 @@ class IngredientsForm extends React.Component {
     this.setState({ingredients: this.props.ingredients});
   }
   render(){
-
+    var self = this;
     var newIngredients = this.state.ingredients.map(item =>{
       return (
-        <li key={item.cid} className="list-group-item"> {item.get('qty')} {item.get('units')} {item.get('name')}</li>
+        <li key={item.cid} className="list-group-item"> {item.get('qty')} {item.get('units')} {item.get('name')}
+          <button onClick={function(event){
+            event.preventDefault();
+            self.props.deleteFromOrder(item);}}
+            type="button" className="close" aria-label="Close"><span aria-hidden="true">&times;</span>
+          </button>
+        </li>
       )
     });
 
@@ -242,5 +257,7 @@ class IngredientsForm extends React.Component {
 }
 
 module.exports = {
-  MainContainer
+  MainContainer,
+  RecipeForm,
+  IngredientsForm
 };

@@ -5,6 +5,8 @@ var ReactDOM = require('react-dom');
 var parse = require('./setup');
 var ServingsContainer = require('./components/servings.jsx').ServingsContainer;
 var MainContainer = require('./components/recipeList.jsx').MainContainer;
+var RecipeForm = require('./components/recipeList.jsx').RecipeForm;
+var IngredientsForm = require('./components/recipeList.jsx').IngredientsForm;
 var LoginContainer = require('./components/login.jsx').LoginContainer;
 
 var User = require('./models/user').User;
@@ -14,7 +16,8 @@ var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'login',
     'recipes/:id':'currentRecipe',
-    'recipes/': 'addNewRecipe'
+    'recipes/': 'addNewRecipe',
+    'recipe/add': 'actuallyAdd'
   },
   initialize: function(){
   // Do the parse setup to set headers and configure API url
@@ -43,9 +46,19 @@ var AppRouter = Backbone.Router.extend({
       document.getElementById('app')
     )
   },
-  currentRecipe: function(id){
+  actuallyAdd: function(){
+
     ReactDOM.render(
-      React.createElement(ServingsContainer, id),
+      React.createElement(RecipeForm),
+      document.getElementById('app')
+    )
+
+  },
+  currentRecipe: function(id){
+
+
+    ReactDOM.render(
+      React.createElement(ServingsContainer, {id: id}),
       document.getElementById('app')
     )
   },

@@ -3,25 +3,38 @@ var React = require('react');
 var BaseLayout = require('./layouts/base.jsx').BaseLayout;
 var IngredientCollection = require('../models/models.js').IngredientCollection;
 var RecipeCollection = require('../models/models.js').RecipeCollection;
+var Recipe = require('../models/models.js').Recipe;
 
 class ServingsContainer extends React.Component{
   constructor(props){
     super(props);
-    var ingredientCollection = new IngredientCollection();
 
+    var currentRecipe = new Recipe();
+    var modifier = 1;
 
-    ingredientCollection.add([
-      {name: 'chopped onion', qty: 1, units: 'cup'},
-      {name: 'diced carrots', qty: .5, units: 'cup'},
-      {name: 'beef tenderloin', qty: 3, units: 'lbs'}
-    ]);
+    var recipeCollection = new RecipeCollection();
+
+    recipeCollection.fetch().then(()=> {
+      console.log(recipeCollection);
+      console.log(props);
+
+      currentRecipe = recipeCollection.findWhere({objectId: this.props.id});
+      console.log('current', currentRecipe);
+      modifier = currentRecipe.get('qty');
+      console.log(modifier);
+      this.setState({currentRecipe: currentRecipe, recipeCollection: recipeCollection, modifier:modifier});
+
+    });
+
 
     this.changeServing = this.changeServing.bind(this);
 
     this.state = {
-      ingredientCollection: ingredientCollection,
-      modifier: 1
+      recipeCollection: recipeCollection,
+      currentRecipe: currentRecipe,
+      modifier: modifier
     }
+    console.log(this.state);
 
   }
   changeServing(modifier){
@@ -31,16 +44,20 @@ class ServingsContainer extends React.Component{
 
   }
   render(){
+    console.log(this.state.currentRecipe);
     return (
       <BaseLayout>
         <div className="serving-size">
           <div className="row">
-            <ServingsForm changeServing={this.changeServing} />
+            <ServingsForm changeServing={this.changeServing}
+                          servingSize={this.state.currentRecipe.get('qty')}
+
+              />
           </div>
             <h3>Ingredients you'll need:</h3>
 
             <IngredientList
-              ingredientCollection={this.state.ingredientCollection}
+              ingredientCollection={this.state.currentRecipe.get('ingredients')}
               modifier={this.state.modifier}
             />
         </div>
@@ -93,15 +110,12 @@ class IngredientList extends React.Component{
 
 
   }
-  // componentWillReceiveProps(multiplier){
-  //   console.log(this.state.modifier);
-  //   this.setState({modifier: this.props.modifier});
-  // }
   render(){
 
+    console.log('here', this.props.ingredientCollection);
     var ingredients = this.props.ingredientCollection.map(foodItem =>{
       return (
-        <li key={foodItem.cid} className="list-group-item"><input type="checkbox" value={this.props.modifier} /><span> {foodItem.get('qty') * this.props.modifier} {foodItem.get('units')} {foodItem.get('name')}</span></li>
+        <li key={this.props.ingredientCollection.indexOf(foodItem)} className="list-group-item"><input type="checkbox" value={this.props.modifier} /><span> {foodItem.qty * this.props.modifier} {foodItem.units} {foodItem.name}</span></li>
       )
     })
     return (
@@ -112,16 +126,6 @@ class IngredientList extends React.Component{
   }
 }
 
-// class IngredientItem extends React.Component{
-//   render(){
-//     return (
-//
-//
-//
-//
-//     )
-//   }
-// }
 
 module.exports = {
   ServingsContainer
