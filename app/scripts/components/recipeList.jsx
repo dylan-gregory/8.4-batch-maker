@@ -56,11 +56,13 @@ class MainContainer extends React.Component {
     )
   }
 }
+
 // this was used when I had the add form on the same page
 // <h4>Add a new recipe? <button onClick={this.handleToggleForm} className="btn btn-default"><i className="fa fa-plus" aria-hidden="true"></i></button></h4>
 // {this.state.showForm ? <RecipeForm
 //                         addNewRecipe={this.addNewRecipe}
 //                         /> : null}
+
 
 class RecipesList extends React.Component {
   render(){
@@ -161,9 +163,10 @@ class RecipeForm extends React.Component{
     return (
       <BaseLayout>
       <div className="row">
-        <form onSubmit={this.addNewRecipe}>
-          <div className="row">
 
+        <form onSubmit={this.addNewRecipe}>
+
+          <div className="row">
             <div className="col-xs-6 col-md-4">
               <a href="#" className="thumbnail">
                 <img src="" alt="" />
@@ -171,21 +174,16 @@ class RecipeForm extends React.Component{
               <input className="form-control" onChange={this.handleUrl} placeholder="Image url"/>
             </div>
             <div className="col-xs-6 col-md-8">
-              <input className="form-control" onChange={this.handleRecipeName} type="text" placeholder="Recipe Name" />
+              <div className="row">
+              <label htmlFor="label-test">Click Me</label>
+              <input id="label-test" type="text" />
+
+              <label className="control-label" htmlFor="name">Recipe Name</label>
+              <input className="form-control" onChange={this.handleRecipeName} id="name" type="text" placeholder="Recipe Name" />
               <input className="form-control" onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
+              </div>
             </div>
-            <div className="checkbox">
-              <label>
-                <input type="checkbox" value="" />
-                Make Public
-              </label>
-            </div>
-            <div className="checkbox">
-              <label>
-                <input type="checkbox" value="" />
-                Keep Private
-              </label>
-            </div>
+
           </div>
 
           <div className="row">

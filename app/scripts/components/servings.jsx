@@ -10,50 +10,51 @@ class ServingsContainer extends React.Component{
     super(props);
 
     var currentRecipe = new Recipe();
-    var modifier = 1;
 
     var recipeCollection = new RecipeCollection();
-
-    recipeCollection.fetch().then(()=> {
-      console.log(recipeCollection);
-      console.log(props);
-
-      currentRecipe = recipeCollection.findWhere({objectId: this.props.id});
-      console.log('current', currentRecipe);
-      modifier = currentRecipe.get('qty');
-      console.log(modifier);
-      this.setState({currentRecipe: currentRecipe, recipeCollection: recipeCollection, modifier:modifier});
-
-    });
-
-
-    this.changeServing = this.changeServing.bind(this);
 
     this.state = {
       recipeCollection: recipeCollection,
       currentRecipe: currentRecipe,
-      modifier: modifier
+      origServing: '',
+      modifier: 1
     }
-    console.log(this.state);
 
+    recipeCollection.fetch().then(()=> {
+      currentRecipe = recipeCollection.findWhere({objectId: this.props.id});
+      var origServing = currentRecipe.get('qty');
+      // console.log(modifier);
+      this.setState({currentRecipe: currentRecipe, recipeCollection: recipeCollection, origServing: origServing });
+      console.log('done fetch', this.state.origServing);
+    });
+
+    this.changeServing = this.changeServing.bind(this);
   }
-  changeServing(modifier){
-    var multiplier = this.state.modifier;
-    multiplier = modifier;
-    this.setState({modifier: multiplier});
+  changeServing(servings){
+    var modifier = servings / this.state.currentRecipe.get('qty');
+
+    this.setState({modifier: modifier});
 
   }
   render(){
-    console.log(this.state.currentRecipe);
+
     return (
       <BaseLayout>
-        <div className="serving-size">
+        <div className="serving-size well">
           <div className="row">
-            <ServingsForm changeServing={this.changeServing}
-                          servingSize={this.state.currentRecipe.get('qty')}
 
-              />
+            <h2>{this.state.currentRecipe.get('name')}</h2>
+
+            { this.state.origServing !== '' ? <ServingsForm changeServing={this.changeServing}
+                        servingSize={this.state.origServing}
+                          /> : null }
+
+
           </div>
+
+
+
+
             <h3>Ingredients you'll need:</h3>
 
             <IngredientList
@@ -72,23 +73,26 @@ class ServingsForm extends React.Component{
     this.handleChangeServing = this.handleChangeServing.bind(this);
     this.changeServing = this.changeServing.bind(this);
 
+    console.log('that',this.props.servingSize);
+
     this.state = {
-      modifier: 1
-    }
+      servings: this.props.servingSize
+    };
+    console.log('this', this.state.servings);
   }
   handleChangeServing(e){
     e.preventDefault();
-    this.setState({modifier: e.target.value});
+    this.setState({servings: e.target.value});
     // var modifier = (recipe.qty / this.state.modifier);
   }
   changeServing(e){
     e.preventDefault();
-    this.props.changeServing(this.state.modifier)
+    this.props.changeServing(this.state.servings)
   }
   render(){
     return (
-      <form onSubmit={this.changeServing} className="well"action="">
-        <span>Makes <input onChange={this.handleChangeServing} className="form-control serving-number" value={this.state.modifier} type="text" /> servings</span>
+      <form onSubmit={this.changeServing} className="adjust-bar"action="">
+        <span>Makes <input onChange={this.handleChangeServing} className="form-control serving-number" value={this.state.servings} type="text" /> servings</span>
         <div className="input-group">
           <span className="input-group-addon">
             <input type="radio" aria-label="..." />
@@ -111,8 +115,6 @@ class IngredientList extends React.Component{
 
   }
   render(){
-
-    console.log('here', this.props.ingredientCollection);
     var ingredients = this.props.ingredientCollection.map(foodItem =>{
       return (
         <li key={this.props.ingredientCollection.indexOf(foodItem)} className="list-group-item"><input type="checkbox" value={this.props.modifier} /><span> {foodItem.qty * this.props.modifier} {foodItem.units} {foodItem.name}</span></li>
