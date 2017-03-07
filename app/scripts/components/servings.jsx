@@ -43,7 +43,7 @@ class ServingsContainer extends React.Component{
         <div className="serving-size well">
           <div className="row">
             <div className="col-md-6">
-            <div><img src={this.state.currentRecipe.get('url')} /></div>
+            <div><img className="detail-img" src={this.state.currentRecipe.get('url')} /></div>
             </div>
             <div className="col-md-6">
             <h2>{this.state.currentRecipe.get('name')}</h2>
@@ -55,9 +55,6 @@ class ServingsContainer extends React.Component{
 
 
           </div>
-
-
-
 
             <h3>Ingredients you'll need:</h3>
 
@@ -99,7 +96,7 @@ class ServingsForm extends React.Component{
         <span>Makes <input onChange={this.handleChangeServing} className="form-control serving-number" value={this.state.servings} type="text" /> servings</span>
         <div className="input-group">
 
-          <button className="btn btn-success">Adjust Recipe</button>
+          <button className="btn btn-success">Adjust Serving Size</button>
         </div>
       </form>
     )

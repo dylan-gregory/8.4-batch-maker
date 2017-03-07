@@ -17,7 +17,7 @@ img {
 }
 
 .serving-number{
-  width: 10%;
+  width: 6%;
 }
 
 .thumbnail{
@@ -42,4 +42,41 @@ img {
 .flexbox{
   display: flex;
 
+}
+
+.ingred-form{
+  margin-bottom: 20px;
+}
+
+.new-recipe-btn{
+  float: right;
+}
+
+.new-name{
+  margin-bottom: 20px;
+  height: 50px;
+  font-size: 18px;
+  margin-right: 10px;
+  width: 95%;
+}
+
+.new-serve-size{
+  height: 50px;
+  font-size: 18px;
+  margin-right: 10px;
+  width: 95%;
+}
+
+.detail-img{
+  height: 200px;
+  width: 400px;
+}
+
+.serving-size{
+  padding-left: 20px;
+}
+
+.thumbnail > .list-img{
+  height: 50%;
+  width: 90%;
 }

@@ -20,10 +20,20 @@ var AppRouter = Backbone.Router.extend({
     'recipe/add': 'actuallyAdd'
   },
   initialize: function(){
+
+    if (User.current()) {
+      var user = User.current();
+      parse.setup({
+        BASE_API_URL: 'https://tiny-parse-server.herokuapp.com', sessionID: user.get('sessionToken')
+      });
+
+    }else {
+      parse.setup({
+        BASE_API_URL: 'https://tiny-parse-server.herokuapp.com'
+      });
+    }
   // Do the parse setup to set headers and configure API url
-  parse.setup({
-    BASE_API_URL: 'https://tiny-parse-server.herokuapp.com'
-  });
+
   },
   execute: function(callback, args, name) {
   // var isLoggedIn = localStorage.getItem('user');

@@ -5,6 +5,7 @@ var BaseLayout = require('./layouts/base.jsx').BaseLayout;
 var IngredientCollection = require('../models/models.js').IngredientCollection;
 var Ingredient = require('../models/models.js').Ingredient;
 var RecipeCollection = require('../models/models.js').RecipeCollection;
+var User = require('../models/user.js').User;
 
 var myRouter = require('../router.js').myRouter;
 
@@ -15,8 +16,13 @@ class MainContainer extends React.Component {
 
     this.addNewRecipe = this.addNewRecipe.bind(this);
 
+    var userId = User.current().get('objectId');
+
     var recipeCollection = new RecipeCollection();
-    recipeCollection.fetch().then(()=> {
+
+    recipeCollection.parseWhere(
+      'owner', '_User', userId
+    ).fetch().then(()=> {
       this.setState({recipeCollection});
     });
 
@@ -31,6 +37,8 @@ class MainContainer extends React.Component {
 
   }
   addNewRecipe(recipe){
+
+
     this.state.recipeCollection.create(recipe, {success: () => {
       this.setState({recipeCollection: this.state.recipeCollection});
     }});
@@ -78,7 +86,7 @@ class RecipesList extends React.Component {
 
           <div key={recipe.cid} className="col-sm-6 col-md-4">
             <div className="thumbnail">
-              <img src={recipe.get('url')} alt="" />
+              <img className="list-img" src={recipe.get('url')} alt="" />
               <div className="caption">
                 <h3><a onClick={(e) => {e.preventDefault();
                      this.props.viewRecipe(recipe);}}
@@ -117,6 +125,9 @@ class RecipeForm extends React.Component{
     this.handleUrl = this.handleUrl.bind(this);
     this.deleteFromOrder = this.deleteFromOrder.bind(this);
 
+    var user = User.current();
+
+    console.log(user);
 
     this.state = {
       name: '',
@@ -124,13 +135,18 @@ class RecipeForm extends React.Component{
       url: '',
       ingredients: ingredients,
       tempIngred: new Ingredient(),
+      owner: {"__type": "Pointer", "className": "_User", "objectId": user.get('objectId')}
     }
+
+    // recipe.setPointer('owner', 'User', user.get('objectId'));
   }
   addIngredient(){
     console.log('tempIngred', this.state.tempIngred);
     var ingredients = this.state.ingredients;
     ingredients.add(this.state.tempIngred.clone());
     this.setState({ingredients: ingredients});
+
+
   }
   handleRecipeName(e){
     this.setState({name: e.target.value});
@@ -158,17 +174,18 @@ class RecipeForm extends React.Component{
     e.preventDefault();
     this.props.addNewRecipe(this.state);
 
+
   }
   deleteFromOrder(item){
-    var updatedOrder = this.state.ingredients;
-    updatedOrder.remove(item);
-    this.setState({ingredients: updatedOrder});
+    var updatedList = this.state.ingredients;
+    updatedList.remove(item);
+    this.setState({ingredients: updatedList});
   }
   render(){
 
     return (
 
-      <div className="row">
+      <div className="row well">
 
         <form onSubmit={this.addNewRecipe}>
 
@@ -182,8 +199,8 @@ class RecipeForm extends React.Component{
             <div className="col-xs-6 col-md-8">
               <div className="row">
 
-              <input className="form-control" onChange={this.handleRecipeName} id="name" type="text" placeholder="Recipe Name" />
-              <input className="form-control" onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
+              <input className="form-control new-name" onChange={this.handleRecipeName} id="name" type="text" placeholder="Recipe Name" />
+              <input className="form-control new-serve-size" onChange={this.handleServingSize} type="text" placeholder="Serving Size" />
               </div>
             </div>
 
@@ -196,7 +213,7 @@ class RecipeForm extends React.Component{
           </div>
 
             <h3>Add ingredients:</h3>
-            <div className="row flexbox">
+            <div className="row flexbox ingred-form">
                 <input onChange={this.handleIngredAmount} type="number" className="form-control ingred-amount" placeholder="#" />
                 <input onChange={this.handleIngredUnits} type="text" className="form-control ingred-units" placeholder="units" />
                 <div className="input-group ingred-name">
@@ -205,11 +222,12 @@ class RecipeForm extends React.Component{
                     <button onClick={this.addIngredient} className="btn btn-default form-control" type="button"><i className="fa fa-plus" aria-hidden="true"></i></button>
                   </span>
               </div>
+              </div>
                 <IngredientsForm ingredients={this.state.ingredients}
                                  deleteFromOrder={this.deleteFromOrder}
                   />
-          </div>
-          <input type="submit" className="btn btn-success" value="Add New Recipe"/>
+
+          <input type="submit" className="btn btn-success new-recipe-btn" value="Add New Recipe"/>
         </form>
       </div>
 
@@ -245,7 +263,7 @@ class IngredientsForm extends React.Component {
     });
 
     return (
-      <div>
+      <div className="row">
         <ul className="list-group">
 
           {newIngredients}
