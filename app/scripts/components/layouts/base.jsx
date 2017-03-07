@@ -26,7 +26,7 @@ class BaseLayout extends React.Component{
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul className="nav navbar-nav navbar-right">
                 <li><a href="#recipes/">My Recipes</a></li>
-                <li><a href="#recipe/add">Add New Recipe</a></li>
+
                 <li><a href="#"><button onClick={this.signOut} className="btn btn-danger">Log Out</button></a></li>
               </ul>
             </div>
@@ -52,6 +52,8 @@ class BaseLayout extends React.Component{
     )
   }
 }
+
+// <li><a href="#recipe/add">Add New Recipe</a></li>
 
 module.exports = {
   BaseLayout

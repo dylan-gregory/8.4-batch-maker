@@ -42,8 +42,12 @@ class ServingsContainer extends React.Component{
       <BaseLayout>
         <div className="serving-size well">
           <div className="row">
-
+            <div className="col-md-6">
+            <div><img src={this.state.currentRecipe.get('url')} /></div>
+            </div>
+            <div className="col-md-6">
             <h2>{this.state.currentRecipe.get('name')}</h2>
+            </div>
 
             { this.state.origServing !== '' ? <ServingsForm changeServing={this.changeServing}
                         servingSize={this.state.origServing}
@@ -94,12 +98,7 @@ class ServingsForm extends React.Component{
       <form onSubmit={this.changeServing} className="adjust-bar"action="">
         <span>Makes <input onChange={this.handleChangeServing} className="form-control serving-number" value={this.state.servings} type="text" /> servings</span>
         <div className="input-group">
-          <span className="input-group-addon">
-            <input type="radio" aria-label="..." />
-          </span>
-          <span className="input-group-addon">
-            <input type="radio" aria-label="..." />
-          </span>
+
           <button className="btn btn-success">Adjust Recipe</button>
         </div>
       </form>

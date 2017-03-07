@@ -48,10 +48,10 @@ var AppRouter = Backbone.Router.extend({
   },
   actuallyAdd: function(){
 
-    ReactDOM.render(
-      React.createElement(RecipeForm),
-      document.getElementById('app')
-    )
+    // ReactDOM.render(
+    //   React.createElement(RecipeForm),
+    //   document.getElementById('app')
+    // )
 
   },
   currentRecipe: function(id){
