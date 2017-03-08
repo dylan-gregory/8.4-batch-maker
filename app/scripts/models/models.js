@@ -3,13 +3,22 @@ var Backbone = require('backbone');
 var parse = require('../setup');
 
 var ParseModel = Backbone.Model.extend({
-  idAttribute: 'objectID',
-  // save(){
-  //
-  // },
-  setPointer: function(fieldName, parseClass, objectID){
-    var pointerObject = {"__type": "Pointer", "className": parseClass, "objectId": objectID};
-    this.set(fieldName, pointerObject);
+  idAttribute: 'objectId',
+  save: function(key, val, options){
+    delete this.attributes.createdAt;
+    delete this.attributes.updatedAt;
+
+    return Backbone.Model.prototype.save.apply(this, arguments);
+  },
+  setPointer: function(field, parseClass, objectId){
+    var pointerObject = {
+      "__type": "Pointer",
+      "className": parseClass,
+      "objectId": objectId
+    };
+
+    this.set(field, pointerObject);
+
     return this;
   }
 });
@@ -17,15 +26,26 @@ var ParseModel = Backbone.Model.extend({
 var ParseCollection = Backbone.Collection.extend({
   whereClause: {},
   parseWhere: function(field, value, objectId){
-
-    if (objectId) {
+    // If an objectId is passed in then we are building a pointer where
+    if(objectId){
       value = {
         field: field,
         className: value,
         objectId: objectId,
-        '__type': ' Pointer'
+        '__type': 'Pointer'
       };
     }
+
+    // // Check if the field has a search option set
+    // if(field.indexOf('$') !== -1){
+    //   var search = field.split('$');
+    //   field = search[0];
+    //   var comparison = '$' + search[1];
+    //
+    //   var clause = {};
+    //   clause[comparison] = value;
+    //   value = clause;
+    // }
 
     this.whereClause[field] = value;
 
@@ -38,7 +58,11 @@ var ParseCollection = Backbone.Collection.extend({
       url += '?where=' + JSON.stringify(this.whereClause);
       this.whereClause = {};
     }
+
     return url;
+  },
+  parse: function(data){
+    return data.results;
   }
 });
 
@@ -54,12 +78,12 @@ var Recipe = ParseModel.extend({
 
 var RecipeCollection = ParseCollection.extend({
   model: Recipe,
-  url: function(){
-    return parse.BASE_API_URL + '/classes/gregory'
-  },
-  parse: function(data){
-    return data.results
-  },
+  // url: function(){
+  //   return parse.BASE_API_URL + '/classes/gregory'
+  // },
+  // parse: function(data){
+  //   return data.results
+  // },
   baseUrl:'https://tiny-parse-server.herokuapp.com/classes/gregory'
 });
 

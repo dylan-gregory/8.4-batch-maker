@@ -141,7 +141,6 @@ class RecipeForm extends React.Component{
     // recipe.setPointer('owner', 'User', user.get('objectId'));
   }
   addIngredient(){
-    console.log('tempIngred', this.state.tempIngred);
     var ingredients = this.state.ingredients;
     ingredients.add(this.state.tempIngred.clone());
     this.setState({ingredients: ingredients});
@@ -150,11 +149,9 @@ class RecipeForm extends React.Component{
   }
   handleRecipeName(e){
     this.setState({name: e.target.value});
-    console.log(this.state);
   }
   handleServingSize(e){
     this.setState({qty: e.target.value});
-    console.log(this.state);
   }
   handleUrl(e){
     this.setState({url: e.target.value});
@@ -162,7 +159,6 @@ class RecipeForm extends React.Component{
   handleIngredAmount(e){
     this.state.tempIngred.set('qty', e.target.value);
 
-    console.log(this.state.tempIngred);
   }
   handleIngredUnits(e){
     this.state.tempIngred.set('units', e.target.value);

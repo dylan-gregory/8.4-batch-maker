@@ -25,7 +25,7 @@ class ServingsContainer extends React.Component{
       var origServing = currentRecipe.get('qty');
       // console.log(modifier);
       this.setState({currentRecipe: currentRecipe, recipeCollection: recipeCollection, origServing: origServing });
-      console.log('done fetch', this.state.origServing);
+      
     });
 
     this.changeServing = this.changeServing.bind(this);
@@ -74,12 +74,10 @@ class ServingsForm extends React.Component{
     this.handleChangeServing = this.handleChangeServing.bind(this);
     this.changeServing = this.changeServing.bind(this);
 
-    console.log('that',this.props.servingSize);
-
     this.state = {
       servings: this.props.servingSize
     };
-    console.log('this', this.state.servings);
+
   }
   handleChangeServing(e){
     e.preventDefault();
