@@ -18,6 +18,6 @@
   // <NavItem url="auth/" name="Login"/>
   //
   // it would also add the "sr-only"(current) span tag in too
-
-  To pull out only items that were made by me, WHERE clause - under queries in the docs
-  
+  // 
+  // To pull out only items that were made by me, WHERE clause - under queries in the docs
+  //
