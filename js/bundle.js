@@ -166,6 +166,7 @@ var BaseLayout = require('./layouts/base.jsx').BaseLayout;
 var IngredientCollection = require('../models/models.js').IngredientCollection;
 var Ingredient = require('../models/models.js').Ingredient;
 var RecipeCollection = require('../models/models.js').RecipeCollection;
+var User = require('../models/user.js').User;
 
 var myRouter = require('../router.js').myRouter;
 
@@ -176,8 +177,13 @@ class MainContainer extends React.Component {
 
     this.addNewRecipe = this.addNewRecipe.bind(this);
 
+    var userId = User.current().get('objectId');
+
     var recipeCollection = new RecipeCollection();
-    recipeCollection.fetch().then(()=> {
+
+    recipeCollection.parseWhere(
+      'owner', '_User', userId
+    ).fetch().then(()=> {
       this.setState({recipeCollection});
     });
 
@@ -192,6 +198,8 @@ class MainContainer extends React.Component {
 
   }
   addNewRecipe(recipe){
+
+
     this.state.recipeCollection.create(recipe, {success: () => {
       this.setState({recipeCollection: this.state.recipeCollection});
     }});
@@ -239,7 +247,7 @@ class RecipesList extends React.Component {
 
           React.createElement("div", {key: recipe.cid, className: "col-sm-6 col-md-4"}, 
             React.createElement("div", {className: "thumbnail"}, 
-              React.createElement("img", {src: recipe.get('url'), alt: ""}), 
+              React.createElement("img", {className: "list-img", src: recipe.get('url'), alt: ""}), 
               React.createElement("div", {className: "caption"}, 
                 React.createElement("h3", null, React.createElement("a", {onClick: (e) => {e.preventDefault();
                      this.props.viewRecipe(recipe);}, 
@@ -278,6 +286,9 @@ class RecipeForm extends React.Component{
     this.handleUrl = this.handleUrl.bind(this);
     this.deleteFromOrder = this.deleteFromOrder.bind(this);
 
+    var user = User.current();
+
+    console.log(user);
 
     this.state = {
       name: '',
@@ -285,21 +296,23 @@ class RecipeForm extends React.Component{
       url: '',
       ingredients: ingredients,
       tempIngred: new Ingredient(),
+      owner: {"__type": "Pointer", "className": "_User", "objectId": user.get('objectId')}
     }
+
+    // recipe.setPointer('owner', 'User', user.get('objectId'));
   }
   addIngredient(){
-    console.log('tempIngred', this.state.tempIngred);
     var ingredients = this.state.ingredients;
     ingredients.add(this.state.tempIngred.clone());
     this.setState({ingredients: ingredients});
+
+
   }
   handleRecipeName(e){
     this.setState({name: e.target.value});
-    console.log(this.state);
   }
   handleServingSize(e){
     this.setState({qty: e.target.value});
-    console.log(this.state);
   }
   handleUrl(e){
     this.setState({url: e.target.value});
@@ -307,7 +320,6 @@ class RecipeForm extends React.Component{
   handleIngredAmount(e){
     this.state.tempIngred.set('qty', e.target.value);
 
-    console.log(this.state.tempIngred);
   }
   handleIngredUnits(e){
     this.state.tempIngred.set('units', e.target.value);
@@ -319,17 +331,18 @@ class RecipeForm extends React.Component{
     e.preventDefault();
     this.props.addNewRecipe(this.state);
 
+
   }
   deleteFromOrder(item){
-    var updatedOrder = this.state.ingredients;
-    updatedOrder.remove(item);
-    this.setState({ingredients: updatedOrder});
+    var updatedList = this.state.ingredients;
+    updatedList.remove(item);
+    this.setState({ingredients: updatedList});
   }
   render(){
 
     return (
 
-      React.createElement("div", {className: "row"}, 
+      React.createElement("div", {className: "row well"}, 
 
         React.createElement("form", {onSubmit: this.addNewRecipe}, 
 
@@ -343,8 +356,8 @@ class RecipeForm extends React.Component{
             React.createElement("div", {className: "col-xs-6 col-md-8"}, 
               React.createElement("div", {className: "row"}, 
 
-              React.createElement("input", {className: "form-control", onChange: this.handleRecipeName, id: "name", type: "text", placeholder: "Recipe Name"}), 
-              React.createElement("input", {className: "form-control", onChange: this.handleServingSize, type: "text", placeholder: "Serving Size"})
+              React.createElement("input", {className: "form-control new-name", onChange: this.handleRecipeName, id: "name", type: "text", placeholder: "Recipe Name"}), 
+              React.createElement("input", {className: "form-control new-serve-size", onChange: this.handleServingSize, type: "text", placeholder: "Serving Size"})
               )
             )
 
@@ -357,7 +370,7 @@ class RecipeForm extends React.Component{
           ), 
 
             React.createElement("h3", null, "Add ingredients:"), 
-            React.createElement("div", {className: "row flexbox"}, 
+            React.createElement("div", {className: "row flexbox ingred-form"}, 
                 React.createElement("input", {onChange: this.handleIngredAmount, type: "number", className: "form-control ingred-amount", placeholder: "#"}), 
                 React.createElement("input", {onChange: this.handleIngredUnits, type: "text", className: "form-control ingred-units", placeholder: "units"}), 
                 React.createElement("div", {className: "input-group ingred-name"}, 
@@ -365,12 +378,13 @@ class RecipeForm extends React.Component{
                   React.createElement("span", {className: "input-group-btn"}, 
                     React.createElement("button", {onClick: this.addIngredient, className: "btn btn-default form-control", type: "button"}, React.createElement("i", {className: "fa fa-plus", "aria-hidden": "true"}))
                   )
+              )
               ), 
                 React.createElement(IngredientsForm, {ingredients: this.state.ingredients, 
                                  deleteFromOrder: this.deleteFromOrder}
-                  )
-          ), 
-          React.createElement("input", {type: "submit", className: "btn btn-success", value: "Add New Recipe"})
+                  ), 
+
+          React.createElement("input", {type: "submit", className: "btn btn-success new-recipe-btn", value: "Add New Recipe"})
         )
       )
 
@@ -406,7 +420,7 @@ class IngredientsForm extends React.Component {
     });
 
     return (
-      React.createElement("div", null, 
+      React.createElement("div", {className: "row"}, 
         React.createElement("ul", {className: "list-group"}, 
 
           newIngredients
@@ -424,7 +438,7 @@ module.exports = {
   IngredientsForm
 };
 
-},{"../models/models.js":6,"../router.js":8,"./layouts/base.jsx":1,"backbone":10,"react":188}],4:[function(require,module,exports){
+},{"../models/models.js":6,"../models/user.js":7,"../router.js":8,"./layouts/base.jsx":1,"backbone":10,"react":188}],4:[function(require,module,exports){
 "use strict";
 var React = require('react');
 
@@ -453,7 +467,7 @@ class ServingsContainer extends React.Component{
       var origServing = currentRecipe.get('qty');
       // console.log(modifier);
       this.setState({currentRecipe: currentRecipe, recipeCollection: recipeCollection, origServing: origServing });
-      console.log('done fetch', this.state.origServing);
+      
     });
 
     this.changeServing = this.changeServing.bind(this);
@@ -471,7 +485,7 @@ class ServingsContainer extends React.Component{
         React.createElement("div", {className: "serving-size well"}, 
           React.createElement("div", {className: "row"}, 
             React.createElement("div", {className: "col-md-6"}, 
-            React.createElement("div", null, React.createElement("img", {src: this.state.currentRecipe.get('url')}))
+            React.createElement("div", null, React.createElement("img", {className: "detail-img", src: this.state.currentRecipe.get('url')}))
             ), 
             React.createElement("div", {className: "col-md-6"}, 
             React.createElement("h2", null, this.state.currentRecipe.get('name'))
@@ -483,9 +497,6 @@ class ServingsContainer extends React.Component{
 
 
           ), 
-
-
-
 
             React.createElement("h3", null, "Ingredients you'll need:"), 
 
@@ -505,12 +516,10 @@ class ServingsForm extends React.Component{
     this.handleChangeServing = this.handleChangeServing.bind(this);
     this.changeServing = this.changeServing.bind(this);
 
-    console.log('that',this.props.servingSize);
-
     this.state = {
       servings: this.props.servingSize
     };
-    console.log('this', this.state.servings);
+
   }
   handleChangeServing(e){
     e.preventDefault();
@@ -527,7 +536,7 @@ class ServingsForm extends React.Component{
         React.createElement("span", null, "Makes ", React.createElement("input", {onChange: this.handleChangeServing, className: "form-control serving-number", value: this.state.servings, type: "text"}), " servings"), 
         React.createElement("div", {className: "input-group"}, 
 
-          React.createElement("button", {className: "btn btn-success"}, "Adjust Recipe")
+          React.createElement("button", {className: "btn btn-success"}, "Adjust Serving Size")
         )
       )
     )
@@ -578,8 +587,71 @@ var Backbone = require('backbone');
 
 var parse = require('../setup');
 
-var Recipe = Backbone.Model.extend({
+var ParseModel = Backbone.Model.extend({
   idAttribute: 'objectId',
+  save: function(key, val, options){
+    delete this.attributes.createdAt;
+    delete this.attributes.updatedAt;
+
+    return Backbone.Model.prototype.save.apply(this, arguments);
+  },
+  setPointer: function(field, parseClass, objectId){
+    var pointerObject = {
+      "__type": "Pointer",
+      "className": parseClass,
+      "objectId": objectId
+    };
+
+    this.set(field, pointerObject);
+
+    return this;
+  }
+});
+
+var ParseCollection = Backbone.Collection.extend({
+  whereClause: {},
+  parseWhere: function(field, value, objectId){
+    // If an objectId is passed in then we are building a pointer where
+    if(objectId){
+      value = {
+        field: field,
+        className: value,
+        objectId: objectId,
+        '__type': 'Pointer'
+      };
+    }
+
+    // // Check if the field has a search option set
+    // if(field.indexOf('$') !== -1){
+    //   var search = field.split('$');
+    //   field = search[0];
+    //   var comparison = '$' + search[1];
+    //
+    //   var clause = {};
+    //   clause[comparison] = value;
+    //   value = clause;
+    // }
+
+    this.whereClause[field] = value;
+
+    return this;
+  },
+  url: function(){
+    var url = this.baseUrl;
+
+    if(Object.keys(this.whereClause).length > 0){
+      url += '?where=' + JSON.stringify(this.whereClause);
+      this.whereClause = {};
+    }
+
+    return url;
+  },
+  parse: function(data){
+    return data.results;
+  }
+});
+
+var Recipe = ParseModel.extend({
   defaults: function() {
     return {
       name: '',
@@ -589,14 +661,15 @@ var Recipe = Backbone.Model.extend({
   }
 });
 
-var RecipeCollection = Backbone.Collection.extend({
+var RecipeCollection = ParseCollection.extend({
   model: Recipe,
-  url: function(){
-    return parse.BASE_API_URL + '/classes/gregory'
-  },
-  parse: function(data){
-    return data.results
-  }
+  // url: function(){
+  //   return parse.BASE_API_URL + '/classes/gregory'
+  // },
+  // parse: function(data){
+  //   return data.results
+  // },
+  baseUrl:'https://tiny-parse-server.herokuapp.com/classes/gregory'
 });
 
 var Ingredient = Backbone.Model.extend({
@@ -697,10 +770,20 @@ var AppRouter = Backbone.Router.extend({
     'recipe/add': 'actuallyAdd'
   },
   initialize: function(){
+
+    if (User.current()) {
+      var user = User.current();
+      parse.setup({
+        BASE_API_URL: 'https://tiny-parse-server.herokuapp.com', sessionID: user.get('sessionToken')
+      });
+
+    }else {
+      parse.setup({
+        BASE_API_URL: 'https://tiny-parse-server.herokuapp.com'
+      });
+    }
   // Do the parse setup to set headers and configure API url
-  parse.setup({
-    BASE_API_URL: 'https://tiny-parse-server.herokuapp.com'
-  });
+
   },
   execute: function(callback, args, name) {
   // var isLoggedIn = localStorage.getItem('user');
@@ -774,7 +857,7 @@ var parse = {
         xhr.setRequestHeader("X-Parse-REST-API-Key", "slumber");
 
         if(config.sessionId){
-          xhr.setRequestHeader("X-Parse-Session-Token", sessionId);
+          xhr.setRequestHeader("X-Parse-Session-Token", config.sessionId);
         }
       }
     });
